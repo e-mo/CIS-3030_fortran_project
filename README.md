@@ -1,7 +1,7 @@
 # Fortran for Modern Application Development
-Evan Morse
-2025-04-03
-CIS-3030  
+Evan Morse  
+2025-04-03  
+CIS-3030   
 ___
     
 ## Introduction
