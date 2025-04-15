@@ -6,7 +6,7 @@ ___
     
 ## Introduction
 
-```fortran
+```.f90
 program hello
   print *, 'Hello, World!'
 end program hello
@@ -55,7 +55,7 @@ Fortran was proposed by John Backus at IBM in 1953 to address what he felt was a
     FORTRAN 1957's primary design effort was placed in creating a lean and efficient **optimizing** compiler. This was likely the language's greatest success as it proved that a high-level *automatic programming* language could be used to produce performant machine code. 
 
 Below is an example of a simple FORTRAN 1957 program which accepts a radius from the user, uses it to calculate the circumference of a circle, and prints the formatted result to console:
-```fortran
+```.f90
       C CIRCUMFERENCE OF A CIRCLE
       REAL RADIUS, CIRCUM, PI
       PI = 3.14159
@@ -91,7 +91,7 @@ Fortran belongs to a small family of popular programming languages that were dev
 Where `<variable_type>` is one of the built in types (integer, real, complex, character, or logical), and `<variable_name>` must start with a letter and may use letters, numbers, and underscores. 
 
 Below is an example of variable declaration and assignment in Fortran followed by a comparative example in C:
-```fortran
+```.f90
 ! fortran_variables.f90
 
 program variables
@@ -151,7 +151,7 @@ int main() {
 
 ###### Modules
 Fortran 90 introduced the concept of **Modules** which allow the programmer to encapsulate procedures and data for reuse. Here is an example of a module which contains a function definition and code to import that module and call the function:
-```fortran
+```.f90
 ! math_utils module definition with contained function definition
 module math_utils
 implicit none
@@ -166,7 +166,7 @@ contains
   
 end module math_utils
 ```
-```fortran
+```.f90
 ! declaring use of math_utils module and calling square function
 use math_utils
 print *, square(4.0)
