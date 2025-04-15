@@ -93,6 +93,7 @@ Where `<variable_type>` is one of the built in types (integer, real, complex, ch
 Below is an example of variable declaration and assignment in Fortran followed by a comparative example in C:
 ```fortran
 ! fortran_variables.f90
+! <- This is a comment line in modern Fortran
 
 program variables
     ! Always use implicit none. This tells compiler that all variables
