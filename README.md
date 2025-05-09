@@ -81,7 +81,7 @@ Note: lines that start with `C` are ignored by the FORTRAN 1957 compiler as comm
 Fortran 90 (1991) is a notable milestone in the Fortran development timeline. First, note the modern name change from **FORTRAN** to **Fortran**. Fortran 90 was the beginning of the modernization of Fortran, and from Fortran 90 (1991) through Fortran 23 (2023) a great number of syntactic improvements and modern general-purpose programming features were added, greatly expanding the capabilities of the Fortran language. Despite this, Fortran has maintained nearly 100% backwards compatibility and legacy support, and most modern compilers can compile FORTRAN 1957 code without issue.  This has empowered old Fortran code bases to remain relevant and expandable with modern features without breaking existing code.
 
 #### Modern Syntax
-Fortran belongs to a small family of popular programming languages that were developed before the C programming language, and for this reason has a rather unique syntax.
+Fortran belongs to a small family of popular programming languages that were developed before the C programming language, and for this reason has a rather unique syntax. Below are descriptions and examples of some of the core constructs of the Fortran language and their modern syntax.
 
 ######  Variable Declaration
 ```
@@ -93,31 +93,27 @@ Where `<variable_type>` is one of the built in types (integer, real, complex, ch
 Below is an example of variable declaration and assignment in Fortran followed by a comparative example in C:
 ```.f90
 ! fortran_variables.f90
-! <- This is a comment line in modern Fortran
 
-program variables
-    ! Always use implicit none. This tells compiler that all variables
-    ! must be explicitly typed and no type inference will be performed. 
-    ! Implicit typing in modern Fortran is considered a code smell.
-    implicit none
+! Always use implicit none. This tells compiler that all variables
+! must be explicitly typed and no type inference will be performed. 
+! Implicit typing in modern Fortran is considered a code smell.
+implicit none
 
-    ! Variable declaration
-    integer :: amount
-    real :: pi, e
-    complex :: frequency
-    character :: initial
-    logical :: is_okay
+! Variable declaration
+integer :: amount
+real :: pi, e
+complex :: frequency
+character :: initial
+logical :: is_okay
 
-    ! Variable assignment
-    ! Standard variable assignment must occur after declaration.
-    ! integer :: amount = 10 <- valid code but has a special meaning
-    amount = 10
-    pi = 3.1415927
-    frequency = (1.0, -0.5)
-    initial = 'A'
-    is_okay = .false. ! .true. or .false.
-
-end program variables
+! Variable assignment
+! Standard variable assignment must occur after declaration.
+! integer :: amount = 10 <- valid code but has a special meaning
+amount = 10
+pi = 3.1415927
+frequency = (1.0, -0.5)
+initial = 'A'
+is_okay = .false. ! .true. or .false.
 
 ```
 ```C
@@ -132,43 +128,162 @@ typedef struct _complex_s {
 	double imaginary;
 } complex;
 
-int main() {
-	// Standard declaration and assignment can be done in one line
-	int amount = 10;
-	double pi = 3.1415927, e;
-	complex frequency = {.real = 1.0, .imaginary = -0.5};
-	char initial = 'A';
-	bool is_okay = false;
-	
-	return 0;
+// Standard declaration and assignment can be done in one line
+int amount = 10;
+double pi = 3.1415927, e;
+complex frequency = {.real = 1.0, .imaginary = -0.5};
+char initial = 'A';
+bool is_okay = false;
+```
+
+###### Arithmetic Operations
+>Fortran's standard set of arithmetic operations are as follows:  
+>
+>| Operator | Description |
+>| --- | --- | 
+>| \** | Exponentiation |
+>| \* | Multiplication |
+>| / | Division |
+>| + | Addition |
+>| - | Subtraction |
+>
+>***Example:*** 
+>```.f90
+>implicit none
+>real :: a, b, add, sub, mult, div, power
+>
+>a = 10.0
+>b = 3.0
+>
+>! Perform arithmetic operations
+>add   = a + b       ! Addition
+>sub   = a - b       ! Subtraction
+>mult  = a * b       ! Multiplication
+>div   = a / b       ! Division
+>power = a ** b      ! Exponentiation
+>```
+>Note: a lack of the common % (modulus) operator, which instead is performed using the MOD intrinsic function.
+
+###### Functions and Subroutines
+Functions and subroutines are both core constructs for encapsulating reusable code. However, they differ in a few key ways. 
+
+- **Functions: **   
+    Unlike with FORTRAN 1957, modern Fortran compilers no longer enforce that functions are pure, though it is still considered best practice to declare your inputs as immutable (see function example below). Functions have a return value, and thus **can be used within an expression** because a function call ultimately resolves to a value. Below is an example of a pure function that accepts a radius and returns the area of a circle and a comparative example in C.
+
+```.f90
+! Function declaration
+function circle_area(radius) result(area)
+  ! intent(in) declares the input variable 'radius' as an immutable input
+  ! If this were omitted, radius would be mutable within the function (not pure)
+  real, intent(in) :: radius
+  real :: area ! Declared as the output variable above with result(area)
+  ! The parameter attribute declares pi as a symbolic constant rather than a variable
+  ! Compare to #define pi (3.14159) in C
+  real, parameter :: pi = 3.14159
+
+  area = pi * radius**2
+end function circle_area
+
+! Usage
+real :: radius, area
+radius = 5.0
+
+! Use the function in an expression to assign return to 'area'
+area = circle_area(radius)
+```
+```C
+#define PI (3.14159)
+double circle_area(const double radius) {
+  // Note that C has no exponentiation operator
+  double area = PI * (radius * radius);
+  
+  return area;
+}
+```
+C uses the 'const' keyword to declare inputs as immutable, but due to C's type casting system there is no compile or runtime guarantee that the 'const' keyword will be respected. Fortran, on the other hand, is purely statically typed and there is no method like C's type casting to bypass the immutability declaration of the input. 
+
+- **Subroutines:**   
+    Subroutines primarily differ from functions in that they have no return value, and thus **cannot be used within an expression** because a subroutine call does not resolve to a value. For this reason, subroutines are best used when you want to modify input variables or perform actions like printing to a console where a return value is not wanted.   
+
+    Below is an example of a subroutine that, as our function does, calculates the area of a circle. However, the calculated area is instead returned through mutating an input variable. A comparative C example has also been provided.
+```.f90
+subroutine circle_area(radius, area)
+  ! Inputs declared with intent(in) are also immutable in subroutines 
+  real, intent(in) :: radius
+  ! Output variables declared with intent(out) are write only
+  real, intent(out) :: area
+  real, parameter :: pi = 3.14159
+
+  area = pi * radius**2
+end subroutine circle_area
+
+
+! Usage
+real :: radius, area
+radius = 5.0
+
+! Subroutines must be called
+call circle_area(radius, area) ! Will assign circle area to area variable
+
+```
+```C
+#define PI (3.14159)
+
+// C has no concept of subroutines and instead uses void as a return type when
+// no return is expected, and parameters can be passed as pointers to allow the
+// function to modify them.
+void circle_area(cont double radius, double *area) {
+	*area = PI * (radius * radius);
 }
 ```
 
-
 ######  Type Precision 
+Modern Fortran uses the selected_real_kind intrinsic function to define kind parameters that specify the desired precision and range for real numbers. This method promotes portability across different systems and compilers.  
+  
+***Example:*** 
+```.f90
+! precision_example.f90
+program precision_example
+    implicit none
+	! This selects a kind perameter for the real type requesting 15 decimal digits
+	! of precision and an exponent range up to 10^307
+    integer, parameter :: dp = selected_real_kind(p=15, r=307)
+    real(kind=dp) :: high_precision_value
+	
+	! Note: ariable name when selecting kind also becomes a literal type suffix 
+    high_precision_value = 3.141592653589793238_dp
+    print *, "High precision value: ", high_precision_value
+end program precision_example
+
+```
+
+
 ######  Array Notation
 
 #### Modern Features
 
 ###### Modules
-Fortran 90 introduced the concept of **Modules** which allow the programmer to encapsulate procedures and data for reuse. Here is an example of a module which contains a function definition and code to import that module and call the function:
-```.f90
-! math_utils module definition with contained function definition
-module math_utils
-implicit none
+Fortran 90 introduced the concept of ***Modules***, which allow the programmer to encapsulate variables, functions, and subroutines for reuse. Modules promote code organization, namespace separation, and safer dependency management. This is different than C where declaration and definition are split between .c and .h files, and code is shared by including the interface in the .h file. 
 
-  
-  
-contains
-  function square(x)
-    real :: square, x
-    square = x * x
-  end function
-  
-end module math_utils
-```
+***Example:***
 ```.f90
-! declaring use of math_utils module and calling square function
-use math_utils
-print *, square(4.0)
+! constants_module.f90
+module constants
+    implicit none
+    real, parameter :: pi = 3.14159
+    real, parameter :: e  = 2.71828
+contains
+    subroutine print_constants()
+        print *, "Pi = ", pi
+        print *, "e  = ", e
+    end subroutine print_constants
+end module constants
+
+! main_program.f90
+program main
+    use constants
+    implicit none
+
+    call print_constants()
+end program main
 ```
