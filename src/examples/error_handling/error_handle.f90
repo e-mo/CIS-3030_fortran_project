@@ -13,6 +13,7 @@ program error_handle
         write (*, fmt='(A)') &
             'You added extra args, silly! Throwing them away...'
     end if
+    
     call get_command_argument(1, buffer)
     read (buffer, fmt='(F25.16)', iostat=ierr, iomsg=msg) x
     if (ierr /= 0) then

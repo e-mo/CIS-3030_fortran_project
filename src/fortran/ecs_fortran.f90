@@ -16,8 +16,8 @@ program ecs_fortran
   type(process_type) :: math_process
   integer, allocatable :: entity_ids(:)
 
-  ! External packed arrays (cache-local), declared as POINTER
-  type(component), pointer :: pack1(:), pack2(:)
+  ! External packed arrays declared as POINTER
+  type(component), pointer :: comp1(:), comp2(:)
 
   ! ECS component-array wrappers
   type(component_array), target :: comp_array_1, comp_array_2
@@ -35,11 +35,11 @@ program ecs_fortran
   end forall
 
   ! Allocate the packed buffers
-  allocate(pack1(num_entities), pack2(num_entities))
+  allocate(comp1(num_entities), comp2(num_entities))
 
   ! Initialize component-array wrappers with external buffers
-  call init_component_array(comp_array_1, num_entities, pack1)
-  call init_component_array(comp_array_2, num_entities, pack2)
+  call init_component_array(comp_array_1, num_entities, comp1)
+  call init_component_array(comp_array_2, num_entities, comp2)
 
   ! Register entities into wrappers
   temp_comp = component(0, 0, 0)
@@ -52,9 +52,9 @@ program ecs_fortran
   rand_mod = 100
   do i = 1, num_entities
     call random_component(temp_comp, rand_mod)
-    pack1(i) = temp_comp
+    comp1(i) = temp_comp
     call random_component(temp_comp, rand_mod)
-    pack2(i) = temp_comp
+    comp2(i) = temp_comp
   end do
 
   ! Setup process and run
@@ -77,6 +77,9 @@ program ecs_fortran
   cpu_time = dble(end_clock - start_clock) / dble(clock_rate)
   
   ! Prepare zero-padded strings
+  ! This was necessary to mimic the output created in the C
+  ! prototype, and definitely a way that C printf is easier
+  ! to use than Fortran print.
   write(tstr, '(F5.2)') cpu_time
   if (tstr(1:1) == ' ') tstr(1:1) = '0'
   write(astr, '(F5.2)') (cpu_time*1000)/process_iterations

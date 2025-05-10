@@ -5,11 +5,11 @@ program variables
     implicit none
 
     ! Variable declaration
-    integer :: amount
-    real :: pi, e
-    complex :: frequency
+    integer   :: amount
+    real      :: pi, e
+    complex   :: frequency
     character :: initial
-    logical :: isOkay
+    logical   :: isOkay
 
     ! Variable assignment
     amount = 10
